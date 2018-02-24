@@ -1,0 +1,58 @@
+# Site
+title: OS journey
+description: >- # this means to ignore newlines until "baseurl:"
+  This website has the intention to work as a logbook of my long journey into the
+  Operating Systems (OS) studies. Here, I describe technical and non-technical
+  (rarely) things related to OS. Keep in mind, that I made this logbook for me.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "oslongjourney"
+logo: logo.png
+locale: en_US
+
+# Left Block Images
+background:
+  homepage: images/home.png                           # this image will be shown on homepage's left block
+  post-list: images/home.png             # this image will be shown on post list page
+  default-post: images/unsplash-gallery-image-3.jpg   # this image will be shown when post's front matter doesn't specify any image
+
+# Jekyll
+permalink:          /:title/
+markdown:           kramdown
+highlighter:        rouge
+kramdown:
+  auto_ids:         true
+  footnote_nr:      1
+  entity_output:    as_char
+  toc_levels:       1..6
+  enable_coderay:   false
+sass:
+  sass_dir:         assets/_sass
+  style:            compressed
+
+# Social Links
+#twitter_username: jekyllrb
+github_username:  rodrigosiqueira
+email: siqueira@ime.usp.br
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-gist
+
+# Exclude list
+include: [_pages]
+exclude: [README.md, Gemfile, Gemfile.lock, _site, src, vendor, CNAME, LICENSE, Rakefile, .sass-cache, .DS_Store]
+# Exclude from processing.
+# The following items will not be processed, by default. Create a custom list
+# to override the default setting.
+# exclude:
+#   - Gemfile
+#   - Gemfile.lock
+#   - node_modules
+#   - vendor/bundle/
+#   - vendor/cache/
+#   - vendor/gems/
+#   - vendor/ruby/
