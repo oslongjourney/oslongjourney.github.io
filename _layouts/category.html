@@ -1,0 +1,14 @@
+---
+layout: home
+---
+<h2> CATEGORY </h2>
+
+
+{% for category in site.categories %}
+ {% capture category_name %}{{ category | first }}{% endcapture %}
+  <h3>
+    <a href="{{ site.baseurl }}{{category_name}}">
+      {{ category_name  | slugize }}
+    </a>
+  </h3>
+{% endfor %}
