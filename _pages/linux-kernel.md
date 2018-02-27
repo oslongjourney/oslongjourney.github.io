@@ -1,6 +1,6 @@
 ---
-layout: linux-kernel 
+layout: linux-kernel
 title: Linux Kernel
-description: "List of linux kernel post"
-permalink: /category/Linux-kernel.html
+description: "List of subjects related to Linux kernel"
+permalink: /linux-kernel.html
 ---

@@ -1,6 +1,6 @@
 ---
-layout: category
+layout: categories
 title: Category
 description: "List of categories"
-permalink: /category.html
+permalink: /categories.html
 ---

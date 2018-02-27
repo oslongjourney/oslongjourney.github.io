@@ -7,6 +7,7 @@ url: https://oslongjourney.github.io
 logo: logo.png
 locale: en_US
 timezone: America/Sao_Paulo
+permalink: pretty
 
 # Left Block Images
 background:
@@ -15,7 +16,7 @@ background:
   default-post: images/unsplash-gallery-image-3.jpg   # this image will be shown when post's front matter doesn't specify any image
 
 # Jekyll
-permalink:          /:title/
+permalink:          /:categories/:title/
 markdown:           kramdown
 highlighter:        rouge
 kramdown:

@@ -10,20 +10,20 @@ layout: compress
     <div class="block-left">
       <div class="content">
         <a href="{{ site.url }}" class="logo"><img src="{{ site.url }}/images/{{ site.logo | replace: '.', '-small.' }}"></a>
-        <h1 class="section-title">{{ page.title}}<em>/</em>
+        <h1 class="section-title">{{ page.title }}<em>/</em>
         </h1>
       </div>
     </div>
 
     <div class="block-right">
-      <a href="{{ site.url }}/category.html" title="category" class="posts-menu-icon"></a>
+      <a href="{{ site.url }}/categories.html" title="category" class="posts-menu-icon"></a>
       <a title="projects" class="projects-menu-icon">
         <span></span>
       </a>
       <div class="content">
         <ul class="posts-list">
         {% for post in site.posts %}
-          {% if post.categories contains 'Research' %}
+          {% if post.categories contains 'research' %}
             <li>
               <h2>
                 <h1>{{ post.categories }}</h1>

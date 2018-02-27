@@ -2,7 +2,7 @@
 layout: post
 title:  "Kernel compilation and installation"
 date:   2017-02-26
-categories: Linux-kernel
+categories: linux-kernel
 ---
 
 <a href="{{ site.url }}/images/linux.png"><img src="{{ site.url }}/images/linux.png" alt="Kernel compilation"></a>  
