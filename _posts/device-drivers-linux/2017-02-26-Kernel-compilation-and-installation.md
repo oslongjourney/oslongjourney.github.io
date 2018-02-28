@@ -9,6 +9,7 @@ categories: linux-kernel
 ## Command summary
 
 [//]: <> (TODO: REVISAR)
+[//]: <> (TODO: Lembrar de falar dos pacotes necessários)
 
 Follows the list of commands used in the sequence:
 
@@ -160,9 +161,9 @@ Every Linux Distribution (e.g., Arch, Debian, and Fedora) usually maintain and d
 
 If it is your first attempt to use your own compiled kernel version, I strongly recommend you to use the `.config` file provided by your distribution to increase the chances of success. Later, you can expand the modification as we describe in this tutorial.
 
-Attention
-:   The `.config` file is Super power, invest some time to better understand it. Also, save your working `.config` files, it will save time for you
-
+**Attention:**
+The `.config` file is Super power, invest some time to better understand it. Also, save your working `.config` files, it will save time for you.
+{: .notice_info}
 
 ### Get your `.config` file
 
@@ -182,8 +183,9 @@ cp /boot/config-`uname -r` .config
 
 ### Make your customizations
 
-Attention
-:   There is a basic rule about `.config` file: NEVER CHANGE IT BY HAND, ALWAYS USE A TOOL
+**Attention:**
+There is a basic rule about `.config` file: NEVER CHANGE IT BY HAND, ALWAYS USE A TOOL
+{: .notice_danger}
 
 There is several option to manually change the `.config` file. I will introduce only two:
 
@@ -227,8 +229,9 @@ When you use a configuration file provided by a Linux Distribution, hundreds of 
 make localmodconfig
 {% endhighlight %}
 
-Remember
-:   Enables all the device
+**Remember:**
+Enables all the device
+{: .notice_info}
 
 This command, basically uses `lsmod` to check the enables or disables devices drivers in the `.config` file.
 
@@ -282,9 +285,9 @@ It is important to pay attention in the installation order, we install modules f
 3. Install Image
 4. Update bootloader (Grub)
 
-Attention
-:   Double your attention in the install steps. You can crash your system because you have execute all commands as a root user.
-
+**Attention:**
+Double your attention in the install steps. You can crash your system because you have execute all commands as a root user.
+{: .notice_danger}
 
 ### Install modules and headers
 
@@ -350,8 +353,9 @@ sudo cp /etc/mkinitcpio.d/linux.present /etc/mkinitcpio.d/linux-[name].present
 
 2. Open the copied file, and look it line by line and replaces old kernel name by the name you assigned. See the example:
 
-Attention
-:   Keep in mind, that you have to adapt this file by yourself. There is no blind copy and paste here.
+**Attention:**
+Keep in mind, that you have to adapt this file by yourself. There is no blind copy and paste here.
+{: .notice_danger}
 
 3. Generate he initramfs
 
