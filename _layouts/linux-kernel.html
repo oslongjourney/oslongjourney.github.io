@@ -19,13 +19,13 @@ layout: compress
         <span></span>
       </a>
       <div class="content">
+      <h1>Linux Kernel</h1>
+      <hr>
         <ul class="posts-list">
         {% for post in site.posts %}
           {% if post.categories contains 'linux-kernel' %}
             <li>
               <h2>
-                <h1>{{ post.categories }}</h1>
-                <hr>
                   <a href="{{ site.url }}{{ post.url }}" class="post-title">
                   <span>{{ post.title | markdownify | remove: "<p>" | remove: "</p>" }}</span>
                 </a>
