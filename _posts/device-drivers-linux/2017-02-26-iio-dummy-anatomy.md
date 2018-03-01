@@ -37,6 +37,12 @@ static const struct iio_chan_spec iio_dummy_channels[] = {
     /* Channel has a numeric index of 0 */
     .indexed = 1,
     .channel = 0,
+```
+
+This is the beginning of the `iio_chan_spec` declaration for the `iio_dummy` module. Notice that `iio_dummy_channels` is an array of `iio_chan_spec` and each channel is directly describe as elements of the array. Looking inside the first element we can see the filed `.type`, this is sort of measurements collected by the channel. 
+
+
+```c
     /* What other information is available? */
     .info_mask_separate =
     /*
