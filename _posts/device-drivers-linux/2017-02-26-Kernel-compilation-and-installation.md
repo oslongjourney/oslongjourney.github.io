@@ -13,17 +13,6 @@ categories: linux-kernel
 
 Follows the list of commands used in the sequence:
 
-Qemu:
-{% highlight bash %}
-qemu-img create -f raw kernel_experiments 10G
-
-qemu-system-x86_64 -cdrom ~/path/distro_iso.iso -boot order=d -drive \
-                file=kernel_experiments,format=raw -m 2G
-
-qemu-system-x86_64 -enable-kvm -net nic -net user,hostfwd=tcp::2222-:22,smb=$PWD/ \
-                   -daemonize -m 2G -smp cores=4,cpus=4 kernel_experiments
-{% endhighlight %}
-
 `.config` manipulations:
 
 {% highlight bash %}
@@ -85,45 +74,7 @@ Finally, for the embedded device, you can make tests in a developing kit. In
 this section, we choose our weapons. We will work first with Qemu, followed by
 the local computer. 
 
-Next section presents the basic setup for creating any virtual machine using
-Qemu, few free to skip this section.
-
-### Setup a Qemu image and running
-
-I am not interested in providing details related to virtualization in this
-here; I just present the steps in a very straightforward way.  If you want to
-know the details related to the command present in this section, see my post of
-Qemu. First of all, install  Qemu on your machine. Then, create a new image
-with the command:
-
-{% highlight bash %}
-qemu-img create -f raw kernel_experiments 10G
-{% endhighlight %}
-
-* `qemu-img`: disk image utility.
-  * `create`: Create new disk image.
-  * `-f`: Specifies the format of the image. For simplicity we selected raw.
-  * `name`: kernel_experiments it is the image name.
-  * `size`: In the end you can see the size of 4G, you can change it.
-
-Next, download the distribution ISO of your preference (I recommend Debian and
-Arch), and install it in the raw file with the following command:
-
-{% highlight bash %}
-qemu-system-x86_64 -cdrom ~/path/distro_iso.iso -boot order=d -drive \
-                   file=kernel_experiments,format=raw -m 2G
-{% endhighlight %}
-
-Finally, after the installation it is time to start the machine with the
-command:
-
-{% highlight bash %}
-qemu-system-x86_64 -enable-kvm -net nic -net user,hostfwd=tcp::2222-:22,smb=$PWD/ \
-                   -daemonize -m 2G -smp cores=4,cpus=4 kernel_experiments
-{% endhighlight %}
-
-The above command has a lot of parameters, which is detailed described in the
-Qemu post. So... here is the end of Qemu setup, let's start the real thing.
+If you want to use Qemu for work, I recommend you to read my post about it in "[Use Qemu to play with Linux Kernel]({{ site.baseurl }}{% post_url 2017-02-26-use-qemu-to-play-with-linux %})"
 
 ## Get Your kernel
 
