@@ -163,7 +163,7 @@ If it is your first attempt to use your own compiled kernel version, I strongly 
 
 **Attention:**
 The `.config` file is Super power, invest some time to better understand it. Also, save your working `.config` files, it will save time for you.
-{: .notice_info}
+{: .notice_danger}
 
 ### Get your `.config` file
 
