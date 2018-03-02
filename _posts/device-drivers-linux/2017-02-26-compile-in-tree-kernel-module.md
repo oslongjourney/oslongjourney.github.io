@@ -10,13 +10,13 @@ categories: linux-kernel
 
 ## Command summary
 
-{% highlight bash %}
+```bash
 make modules
 make M=driver/iio/dummy
 sudo make modules_install
 sudo modprobe iio_dummy
 sudo modprobe -r iio_dummy
-{% endhighlight %}
+```
 
 ## Introduction
 
@@ -28,17 +28,17 @@ For this tutorial, I will work on the `driver/iio/dummy` module [1]. However, th
 
 When I started to work with the in-tree modules, I always compiled all modules with the command:
 
-{% highlight bash %}
+```bash
 make modules
-{% endhighlight %}
+```
 
-My `.config` file is narrowed to my computer because I use `localmodconfig` which enables 132 modules. It means, that every single change in the in-tree module that I am working, I wast a lot of time with unsuful stuffs for my task. This really bothered me.
+My `.config` file is narrowed to my computer characteristics because I use `localmodconfig` which enables 132 modules. It means, that every single change in the in-tree module that I am working, I wast a lot of time with unsuful stuffs for my task. This really bothered me.
 
 After some minutes googling about the subject, I found the command:
 
-{% highlight bash %}
+```bash
 make M=driver/iio/dummy
-{% endhighlight %}
+```
 
 This command, enables the compilation of a single module. However, there is a small trick: your module must enabled in the `.config` file.
 
@@ -46,15 +46,15 @@ This command, enables the compilation of a single module. However, there is a sm
 
 For installing the module, I use the command:
 
-{% highlight bash %}
+```bash
 sudo make modules_install
-{% endhighlight %}
+```
 
 I tried to use the command below:
 
-{% highlight bash %}
+```bash
 sudo make modules_install M=driver/iio/dummy
-{% endhighlight %}
+```
 
 However, it not works. I do not know why, if I discover I will update this part.
 
@@ -64,17 +64,64 @@ I tried many times to work with `insmod` command, however I really suffer with i
 
 After the installation, you just need to load the module with the command:
 
-{% highlight bash %}
+```bash
 sudo modprobe iio_dummy
-{% endhighlight %}
+```
 
 To remove the module, use:
 
-{% highlight bash %}
+```bash
 sudo modprobe -r iio_dummy
-{% endhighlight %}
+```
 
-## Rereference
+## Tips and Troubleshoots
+
+### Check installed module
+
+Sometimes, I am not feel confident that my module is correct loaded and I used to add some prints in the code. Another approach, it is update the `MODULE_DESCRIPTION` and check the metadate with the command `modinfo`. For example, change the line in any driver that you use with something like that:
+
+```c
+MODULE_DESCRIPTION("IIO dummy driver -> IIO dummy modified by Me");
+```
+
+Then, after you install the module you can check the description as following:
+
+```bash
+$ modinfo iio_dummy
+filename:       /lib/modules/4.16.0-rc3-TORVALDS+/kernel/drivers/iio/dummy/iio_dummy.ko.xz
+license:        GPL v2
+description:    IIO dummy driver -> IIO dummy modified by Me
+author:         Jonathan Cameron <jic23@kernel.org>
+srcversion:     1C4C5F875A87E3DFD4F2820
+depends:        industrialio-sw-device,industrialio,iio_dummy_evgen,kfifo_buf
+retpoline:      Y
+name:           iio_dummy
+vermagic:       4.16.0-rc3-TORVALDS+ SMP preempt mod_unload modversions
+```
+
+This is really useful, to help you to figure out if your module is correctly load. An common mistake, it is compile the module with a different kernel target which produces errors like:
+
+**Error:**
+FATAL: Module drivers/<path> not found in directory /lib/modules/<kernel_version>
+{: .notice_danger}
+
+If you get this error, the tip above can help you to figure out what is wrong. Lastly, remember to check the kernel Makefile to verify the version or your distro version.
+
+### Get decencies information
+
+Sometimes, it is important to know the modules decencies. You can use the following command:
+
+```bash
+$ modprobe --show-depends <module>
+```
+
+Why this is important? If you try something really radical as `rmmod -f`, it is a good idea to know the exactly decencies related to your device.
+
+**My Experience:**
+My experiece, say to me that is not a good idea to use `rmmod -f` with large modules. It is ok, if the module is small or if it is made by you. If you really know what you are doing, use it; if not, avoid. Prefere `modprobe -r`
+{: .notice_info}
+
+## References
 
 1. [Link to a question in askubuntu that helped me](https://askubuntu.com/questions/168279/how-do-i-build-a-single-in-tree-kernel-module)
 2. [IIO tasks proposed by Daniel Baluta](https://kernelnewbies.org/IIO_tasks)
