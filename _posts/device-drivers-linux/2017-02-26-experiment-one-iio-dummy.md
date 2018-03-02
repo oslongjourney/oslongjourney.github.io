@@ -53,28 +53,54 @@ sudo make modules_install
 sudo modprobe iio_dummy
 ```
 
-If you want to know the details about the compilation/load or have any problem in this step, then read my post "Compile In-tree Driver" [1].
-
-To verify if the module is correct loaded, try:
+If you want to know the details about the compilation/load or have any problem in this step, then read my post "Compile In-tree Driver" [1]. After the above steps, you can check the module information as following:
 
 ```bash
-lssmod | grep dummy
+$ modinfo iio_dummy
+filename:       /lib/modules/4.16.0-rc3-TORVALDS+/kernel/drivers/iio/dummy/iio_dummy.ko.xz
+license:        GPL v2
+description:    IIO dummy driver
+author:         Jonathan Cameron <jic23@kernel.org>
+srcversion:     B2B5E23A9B1B98D882091B3
+depends:        industrialio-sw-device,industrialio,iio_dummy_evgen,kfifo_buf
+retpoline:      Y
+name:           iio_dummy
+vermagic:       4.16.0-rc3-TORVALDS+ SMP preempt mod_unload modversions
 ```
 
-Then, you should see an output similar to this:
-
-TODO
+Then, for verifing if the module is correct loaded you can use the `lsmod` and `grep` together. After you execute the command, you should see an output similar to this: 
 
 ```bash
+$ lsmod | grep iio_dummy
+iio_dummy              16384  0
+industrialio_sw_device    16384  1 iio_dummy
+kfifo_buf              16384  1 iio_dummy
+iio_dummy_evgen        16384  1 iio_dummy
+industrialio           81920  3 iio_dummy,iio_dummy_evgen,kfifo_buf
 ```
 
-Finally, take a look in the `/sys` directory for a final confirmation that everything is right. Try the command below, and verify if your output is similar:
+Finally, let's take a look at the `/sys/bus/iio/devices/` directory as a final confirmation that everything is right. Try the command below, and verify if your output is similar:
 
-TODO
 ```bash
-ls -l /config/iio/devices/dummy/
-ls -l /sys/bus/iio/devices/iio:device0/
-ls -l /sys/bus/iio/devices/iio_evgen/ 
+$ ls -l /sys/bus/iio/devices
+total 0
+lrwxrwxrwx 1 root root 0 Mar  2 15:55 iio_evgen -> ../../../devices/iio_evgen
+
+$ ls -l /sys/bus/iio/devices/iio_evgen/
+total 0
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev0
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev1
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev2
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev3
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev4
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev5
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev6
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev7
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev8
+--w------- 1 root root 4096 Mar  2 15:56 poke_ev9
+drwxr-xr-x 2 root root    0 Mar  2 15:56 power
+lrwxrwxrwx 1 root root    0 Mar  2 15:56 subsystem -> ../../bus/iio
+-rw-r--r-- 1 root root 4096 Mar  2 15:52 uevent
 ```
 
 Finally, at this step, if you want to unload the module just try:
@@ -87,19 +113,104 @@ sudo modprobe -r iio_dummy
 
 ### The configfs
 
-The last step to create your dummy device, it is mount a `configfs` partion in any place that you want. I prefer to it in the `/mnt` directory, as you can see the command below:
+The last step to create your dummy device, it is mount a `configfs` filesystem in whatever place you want. I prefer to do it in the `/mnt` directory, as you can see in the commands below:
 
 ```bash
 sudo mkdir /mnt/iio_experiments/
 sudo mount -t configfs none /mnt/iio_experiments/
 ```
-### Look inside `/sys` after the driver load
 
-TODO: MOSTRAR A PASTA SYS DEPOIS DO COMANDO
+If you take a look at the `/mnt/iio_experiments`, you can see something similar to:
+
+```bash
+$ ls /mnt/iio_experiments/
+iio  pci_ep
+
+$ ls /mnt/iio_experiments/iio/devices/
+dummy
+```
+
+How about create a new device? Just create a new directory inside `dummy` directory:
+
+```bash
+$ sudo mkdir /mnt/iio_experiments/iio/devices/dummy/my_glorious_dummy_device
+
+$ ls /mnt/iio_experiments/iio/devices/dummy/
+my_glorious_dummy_device
+```
+
+### Inspect `/sys/bus/iio/devices` again
+
+How about look again the `/sys/bus/iio/devices/`?
+
+```bash
+$ ls -l /sys/bus/iio/devices/
+total 0
+lrwxrwxrwx 1 root root 0 Mar  2 16:07 iio:device0 -> ../../../devices/iio:device0
+lrwxrwxrwx 1 root root 0 Mar  2 15:55 iio_evgen -> ../../../devices/iio_evgen
+```
+
+Notice that `iio:device0` now appear in the tree. Let's take look inside it:
+
+```c
+$ ls -l /sys/bus/iio/devices/iio:device0/ 
+total 0
+drwxr-xr-x 2 root root    0 Mar  2 16:09 buffer
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 current_timestamp_clock
+-r--r--r-- 1 root root 4096 Mar  2 16:09 dev
+drwxr-xr-x 2 root root    0 Mar  2 16:09 events
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_accel_x_calibbias
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_accel_x_calibscale
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_accel_x_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_activity_running_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_activity_walking_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_sampling_frequency
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_steps_calibheight
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_steps_en
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_steps_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage0_offset
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage0_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage0_scale
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage1-voltage2_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage3-voltage4_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 in_voltage-voltage_scale
+-r--r--r-- 1 root root 4096 Mar  2 16:09 name
+-rw-r--r-- 1 root root 4096 Mar  2 16:09 out_voltage0_raw
+drwxr-xr-x 2 root root    0 Mar  2 16:09 power
+drwxr-xr-x 2 root root    0 Mar  2 16:09 scan_elements
+lrwxrwxrwx 1 root root    0 Mar  2 16:09 subsystem -> ../../bus/iio
+drwxr-xr-x 2 root root    0 Mar  2 16:09 trigger
+-rw-r--r-- 1 root root 4096 Mar  2 16:02 uevent
+```
+
+As you can see, there is many attributes and other stuffs inside it. Each attribute has some information, for example:
+
+```bash
+$ cat /sys/bus/iio/devices/iio:device0/name
+my_glorious_dummy_device
+
+$ cat /sys/bus/iio/devices/iio:device0/in_accel_x_raw
+34
+
+$ cat /sys/bus/iio/devices/iio:device0/in_voltage0_raw
+73
+```
 
 ### Busy device
 
-TODO: EXPLICAR AQUELE PROBLEMA DA REMOÇÃO SENDO IMPEDIDA 
+When I was trying to unload `iio_dummy`, I constantly get this message:
+
+```bash
+$ sudo modprobe -r iio_dummy
+modprobe: FATAL: Module iio_dummy is in use.
+```
+
+I tried many things, I actually tried the command `rmmod -r iio_dummy` and realise that I put my kernel in an unstable state (I got oops message during the reboot). After some hours trying to figure out, I realise the problem is related with the directory `my_glorious_dummy_device` previously create. To solve this problem, I just did:
+
+```bash
+sudo rmdir /mnt/iio_experiments/iio/devices/dummy/my_glorious_dummy_device/
+sudo modprobe -r iio_dummy
+```
 
 ## Adding Channels for a 3-axis compass
 
@@ -284,12 +395,81 @@ Notice that we add `IIO_MAGN` inside `IIO_CHAN_INFO_RAW`, and collected each dat
 		}
 ```
 
+Almost done, I just want to add one final touch. Go to the end of this file and change the description:
+
+```c
+MODULE_DESCRIPTION("IIO dummy driver -> IIO dummy modified by Me");
+```
+
 Done! Compile and install the module again to test the new channels. You should see something similar to:
 
 ```bash
+$ modinfo iio_dummy
+filename:       /lib/modules/4.16.0-rc3-TORVALDS+/kernel/drivers/iio/dummy/iio_dummy.ko.xz
+license:        GPL v2
+description:    IIO dummy driver -> IIO dummy modified by Me
+author:         Jonathan Cameron <jic23@kernel.org>
+srcversion:     1C4C5F875A87E3DFD4F2820
+depends:        industrialio-sw-device,industrialio,iio_dummy_evgen,kfifo_buf
+retpoline:      Y
+name:           iio_dummy
+vermagic:       4.16.0-rc3-TORVALDS+ SMP preempt mod_unload modversions
 ```
 
 ### Test the changes
+
+For finish this tutorial, let's look again the `/sys/bus/iio/devices/iio:device0/`.
+
+```bash
+$ ls -l /sys/bus/iio/devices/iio:device0/
+total 0
+drwxr-xr-x 2 root root    0 Mar  2 16:27 buffer
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 current_timestamp_clock
+-r--r--r-- 1 root root 4096 Mar  2 16:27 dev
+drwxr-xr-x 2 root root    0 Mar  2 16:27 events
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_accel_x_calibbias
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_accel_x_calibscale
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_accel_x_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_activity_running_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_activity_walking_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_magn_scale
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_magn_x_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_magn_y_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_magn_z_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_sampling_frequency
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_steps_calibheight
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_steps_en
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_steps_input
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage0_offset
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage0_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage0_scale
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage1-voltage2_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage3-voltage4_raw
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 in_voltage-voltage_scale
+-r--r--r-- 1 root root 4096 Mar  2 16:27 name
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 out_voltage0_raw
+drwxr-xr-x 2 root root    0 Mar  2 16:27 power
+drwxr-xr-x 2 root root    0 Mar  2 16:27 scan_elements
+lrwxrwxrwx 1 root root    0 Mar  2 16:28 subsystem -> ../../bus/iio
+drwxr-xr-x 2 root root    0 Mar  2 16:27 trigger
+-rw-r--r-- 1 root root 4096 Mar  2 16:27 uevent
+```
+
+Now, you can see four new attributes: in_magn_x_raw, in_magn_y_raw, in_magn_z_raw, and in_magn_scale. Take a look at each one:
+
+```bash
+$ cat /sys/bus/iio/devices/iio:device0/in_magn_scale
+0.000002
+
+$ cat /sys/bus/iio/devices/iio:device0/in_magn_x_raw
+78
+
+$ cat /sys/bus/iio/devices/iio:device0/in_magn_y_raw
+10
+
+$ cat /sys/bus/iio/devices/iio:device0/in_magn_z_raw
+3
+```
 
 ## References
 
