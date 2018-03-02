@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Create a very simple Device Driver"
+title:  "Create a Very Simple Device Driver"
 date:   2017-02-26
 published: true
 categories: linux-kernel

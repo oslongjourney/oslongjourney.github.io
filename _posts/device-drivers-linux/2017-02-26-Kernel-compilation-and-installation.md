@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Kernel compilation and installation"
+title:  "Kernel Compilation and Installation"
 date:   2017-02-26
 published: true
 categories: linux-kernel
 ---
 
-## Command summary
+## Command Summary
 
 [//]: <> (TODO: REVISAR)
 [//]: <> (TODO: Lembrar de falar dos pacotes necessários)
@@ -15,49 +15,49 @@ Follows the list of commands used in the sequence:
 
 `.config` manipulations:
 
-{% highlight bash %}
+```bash
 zcat /proc/config.gz > .config
-{% endhighlight %}
+```
 or
-{% highlight bash %}
+```bash
 cp /boot/config-`uname -r` .config
-{% endhighlight %}
+```
 
 Change `.config` file:
 
-{% highlight bash %}
+```bash
 make nconfig
 make olddefconfig
 make kvmconfig
 make localmodconfig
-{% endhighlight %}
+```
 
 Compile:
 
-{% highlight bash %}
+```bash
 make ARCH=x86_64 -j8
 make modules_install
-{% endhighlight %}
+```
 
 Install:
 
-{% highlight bash %}
+```bash
 sudo make modules_install
 sudo make headers_install INSTALL_HDR_PATH=/usr
 sudo make install
 sudo make install
-{% endhighlight %}
+```
 
 Remove:
 
-{% highlight bash %}
+```bash
 rm -rf /boot/vmlinuz-[target]
 rm -rf /boot/initrd-[target]
 rm -rf /boot/System-map-[target]
 rm -rf /boot/config-[target]
 rm -rf /lib/modules/[target]
 rm -rf /var/lib/initramfs/[target]
-{% endhighlight %}
+```
 
 
 ## Choose Your Weapon
@@ -91,9 +91,9 @@ use Jonathan Cameron repository. You can quickly figure out the target branch
 by looking at the MAINTAINERS file. For this tutorial, we use the Torvalds
 repository.  
 
-{% highlight bash %}
+```bash
 git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-{% endhighlight %}
+```
 
 There are thousands of forks from Linux Kernel spread around the Internet. It
 is possible to find entire organisations that keep their branch of the Kernel
@@ -122,15 +122,15 @@ Depending on the distribution which you use, there is two options to get `.confi
 
 1. Get `.config` from `/proc`
 
-{% highlight bash %}
+```bash
 zcat /proc/config.gz > .config
-{% endhighlight %}
+```
 
 2. Get `.config` from `/boot`
 
-{% highlight bash %}
+```bash
 cp /boot/config-`uname -r` .config
-{% endhighlight %}
+```
 
 ### Make your customizations
 
@@ -140,9 +140,9 @@ There is a basic rule about `.config` file: NEVER CHANGE IT BY HAND, ALWAYS USE 
 
 There is several option to manually change the `.config` file. I will introduce only two:
 
-{% highlight bash %}
+```bash
 make nconfig
-{% endhighlight %}
+```
 
 `nconfig` looks like this:
 
@@ -157,9 +157,9 @@ make nconfig
 
 And finally, we have `menuconfig`:
 
-{% highlight bash %}
+```bash
 make menuconfig
-{% endhighlight %}
+```
 
 `menuconfig` looks like this:
 
@@ -176,9 +176,9 @@ make menuconfig
 
 When you use a configuration file provided by a Linux Distribution, hundreds of device drivers are enabled; normally, you just need a few driver. All the enabled drivers will raise the compile time with no need for you, fortunetally, there is an option that automatically change the `.config` file in order to enabled only required drivers. However, before use the command, it is highly recommended to enable all the devices that you use with your computer in order to ensure that `.config` file have all the required driver by your machine enabled. In other words, plug all the devices that you normally use before execute the command:
 
-{% highlight bash %}
+```bash
 make localmodconfig
-{% endhighlight %}
+```
 
 **Remember:**
 Enables all the device
@@ -190,38 +190,38 @@ This command, basically uses `lsmod` to check the enables or disables devices dr
 
 Sometimes, when you rebase your local master branch with the remote you will notice when try to compile that some questions are raised related to the ativation or deactiavion of features. This happens, because during the evolution of the Kernel new features are added that was not in present in you `.config` file. As a result, you are asked to take a decision. Sometimes, there is a way to partially reduce the amount of asked question with the command:
 
-{% highlight bash %}
+```bash
 make olddefconfig
-{% endhighlight %}
+```
 
 Finally, one last tip is related for someone that make experiments in the Qemu with Kvm. There is an option that enables some important features for this scenario:
 
-{% highlight bash %}
+```bash
 make kvmconfig
-{% endhighlight %}
+```
 
 ## Compile!
 
 Now, it timeeeeee! After a bunch of setup, I am quite sure that you anxious for this part. So, here we go... type:
 
-{% highlight bash %}
+```bash
 make -j [two_times_the_number_of_core]
-{% endhighlight %}
+```
 
 [//]: <> (TODO: Seria legal expandir a explicação do dobro dos cores)
 Just replace the `two_times_the_number_of_core` for the number of cores you have by two. For example, if you have 8 cores you should add 16.
 
 If you want to compile your kernel for one specific computer arquitecture, you can use:
 
-{% highlight bash %}
+```bash
 make ARCH=x86_64 -j [two_times_the_number_of_core]
-{% endhighlight %}
+```
 
 For compiling the kernel modules, type:
 
-{% highlight bash %}
+```bash
 make modules_install
-{% endhighlight %}
+```
 
 ## Compilation Outputs
 
@@ -244,17 +244,17 @@ Double your attention in the install steps. You can crash your system because yo
 
 Just type:
 
-{% highlight bash %}
+```bash
 sudo make modules_install
-{% endhighlight %}
+```
 
 If you want to check the changes, take a look at `/lib/modules/$(uname -r)`
 
 Finally, install headers:
 
-{% highlight bash %}
+```bash
 sudo make headers_install INSTALL_HDR_PATH=/usr
-{% endhighlight %}
+```
 
 ### Install new image (works on Debian)
 
@@ -262,21 +262,21 @@ Finally, it is time to install your Kernel image. This step does not work on Arc
 
 To install the Kernel module just type:
 
-{% highlight bash %}
+```bash
 sudo make install
-{% endhighlight %}
+```
 
 We are, reallyyyyy close to finish the process. We just have to update the bootloader, and here we suppose you are using Grub. Type:
 
-{% highlight bash %}
+```bash
 sudo update-grub2
-{% endhighlight %}
+```
 
 Notice, that the command below is an wrapper to the following command:
 
-{% highlight bash %}
+```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
-{% endhighlight %}
+```
 
 So, if the first command fails try the last one.
 
@@ -288,9 +288,9 @@ If you use Arch Linux, we present the basics steps to install your custom image.
 
 First, you have copy your kernel image to the `/boot/` directory with the command:
 
-{% highlight bash %}
+```bash
 sudo cp -v arch/x86_64/boot/bzImage /boot/vmlinuz-[name]
-{% endhighlight %}
+```
 
 Replace [name] by any name. It could be your name.
 
@@ -298,9 +298,9 @@ Second, you have to create a new `mkinitcpio`. Follow the steps below:
 
 1. Copy an existing `mkinitcpio`
 
-{% highlight bash %}
+```bash
 sudo cp /etc/mkinitcpio.d/linux.present /etc/mkinitcpio.d/linux-[name].present
-{% endhighlight %}
+```
 
 2. Open the copied file, and look it line by line and replaces old kernel name by the name you assigned. See the example:
 
@@ -310,22 +310,22 @@ Keep in mind, that you have to adapt this file by yourself. There is no blind co
 
 3. Generate he initramfs
 
-{% highlight bash %}
+```bash
 sudo mkinitcpio -p linux-[name].prensent
-{% endhighlight %}
+```
 
 ## Remove
 
 Finally, you may want to remove an old Kernel version for space or organization reasons. First of all, boot in another version of the Kernel that you want to remove and follow the steps below:
 
-{% highlight bash %}
+```bash
 rm -rf /boot/vmlinuz-[target]
 rm -rf /boot/initrd-[target]
 rm -rf /boot/System-map-[target]
 rm -rf /boot/config-[target]
 rm -rf /lib/modules/[target]
 rm -rf /var/lib/initramfs/[target]
-{% endhighlight %}
+```
 
 ## References
 

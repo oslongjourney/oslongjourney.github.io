@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Compile in-tree Kernel module"
+title:  "Compile In-tree Kernel Module"
 date:   2017-02-26
 published: true
 categories: linux-kernel

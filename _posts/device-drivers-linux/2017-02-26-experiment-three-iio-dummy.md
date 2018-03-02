@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Experiment Three: IIO Event Monitor"
+title:  "IIO Dummy module Experiment Three: IIO Event Monitor"
 date:   2017-02-26
 published: true
 categories: linux-kernel

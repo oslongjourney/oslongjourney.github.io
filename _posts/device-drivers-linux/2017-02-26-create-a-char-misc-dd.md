@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Create a very char misc Device Driver"
+title:  "Create a Very Char Misc Device Driver"
 date:   2017-02-26
 published: true
 categories: linux-kernel

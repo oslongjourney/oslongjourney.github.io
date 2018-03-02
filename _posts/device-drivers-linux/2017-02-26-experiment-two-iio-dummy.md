@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Experiment Two: Understand some basic stuff about IIO and change iio_dummy"
+title:  "IIO Dummy Experiment Two: Play with IIO Events"
 date:   2017-02-26
 published: true
 categories: linux-kernel
