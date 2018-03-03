@@ -6,7 +6,7 @@ published: true
 categories: linux-kernel
 ---
 
-In this section we conduct a series of basic experiment with `iio_dummy`. Here, we will do the following tasks:
+In this post we conduct a series of basic experiment with `iio_dummy`. Here, we will do the following tasks:
 
 1. Enabled IIO dummy via nconfig;
 2. Compile IIO dummy module;
