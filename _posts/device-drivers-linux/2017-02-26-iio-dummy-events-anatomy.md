@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "The iio_dummy Anatomy"
+title:  "The iio_dummy Events Anatomy"
 date:   2017-02-26
 published: true
 categories: linux-kernel
@@ -183,15 +183,11 @@ data description.
   <figcaption> Code 5: .event_spec </figcaption>
 </figure>
 
-There are two final configuration at the end of the first channel, both related
+There is two final configuration at the end of the first channel, both related
 to events. Notice that events became available if
 `CONFIG_IIO_SIMPLE_DUMMY_EVENTS` only if it is enabled in the `.config` file.
 In a few words, the `.event_spec` field register an array of events, and the
 `.num_event_specs` is the size of the array. We discuss events in the "X". 
-"[The iio_dummy Events Anatomy]({{ site.baseurl }}{% post_url 2017-02-26-iio-dummy-events-anatomy %})"
-
-Now we keep looking the other channels; however, we do not repeat ourselves and
-just explain new things. See:
 
 ```c
 /* Differential ADC channel in_voltage1-voltage2_raw etc*/
@@ -199,12 +195,8 @@ just explain new things. See:
 		.type = IIO_VOLTAGE,
 		.differential = 1,
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 6: Differential </figcaption>
-</figure>
 
-Code 6 shows an ADC converter, which is configured as a differential.
+TODO: I don't know what is differential, it could be nice to discover and add a brief explanation with example here.
 
 ```c
 		/*
@@ -215,14 +207,8 @@ Code 6 shows an ADC converter, which is configured as a differential.
 		.channel = 1,
 		.channel2 = 2,
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 7: Multiple Channels </figcaption>
-</figure>
 
-The field `.channel2` and `.differential` are directly related to the above
-Code; The `.channel2` keeps the differential value number. Here we have the
-first example of a single channel, with multiple information.
+The field `.channel2` is tied with the `.differential` characteristic, it keep a second number for the differential channel.
 
 ```c
 		/*
@@ -238,15 +224,8 @@ first example of a single channel, with multiple information.
 		 */
 		.info_mask_shared_by_type = BIT(IIO_CHAN_INFO_SCALE),
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 8: .info_mask_separate and .info_maks_shared_by_type </figcaption>
-</figure>
 
-Finally, the field `.info_mask_shared_by_type` represents a shared channel
-attribute of the same type which means that other channels can access this
-information. The rest of this channel definition is similar to the last one,
-let's skip the rest of the code and look at the next channel.
+The field `.info_mask_shared_by_type` is a channel attribute shared by all channels of the same type. The rest of this channel definition is similar to the last one described, because of this we skip the rest of the code and look at the next channel.
 
 ```c
 /*
@@ -256,29 +235,16 @@ let's skip the rest of the code and look at the next channel.
 	{
 		.type = IIO_ACCEL,
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 9: .type </figcaption>
-</figure>
 
-Here we have a different type of device represented by the `IIO_ACCEL` which
-means acceleration channel.
+Here we have a different type of device represented by the `IIO_ACCEL` which means acceleration channel.
 
 ```c
 		.modified = 1,
 		/* Channel 2 is use for modifiers */
 		.channel2 = IIO_MOD_X,
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 10: .modified </figcaption>
-</figure>
 
-Here we have another technique to distinguish between data channels in the same
-channel. If the `.modified` field is assigned, the `.channel2` changes its
-meaning and expects a unique characteristic for the channel. In the Code 10,
-this channel receives `IIO_MOD_X`. The rest of the channel definition is
-similar to the last one, so let's go to another different thing.
+Here we have another technique to distinguish between data channels in the same channel. If the field `.modified` is assigned the `.channel2` receive another meaning, by expecting an unique characteristic for the channel. In this case, this channel receives `IIO_MOD_X`. The rest of the channel definition is similar to the last one. Let's jump to another different thing.
 
 ```c
 	/*
@@ -287,21 +253,14 @@ similar to the last one, so let's go to another different thing.
 	 */
 	IIO_CHAN_SOFT_TIMESTAMP(4),
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 11: Timestamp </figcaption>
-</figure>
 
 TODO: I did not understand what is this macro
 
-Oww... a lot of information. I recommend you stop your reading for a while, and
-go to the code and read `iio_dummy_channels` in the `iio_dummy` module. Then
-came back here.
+Stop your reading for a while, and go to the code and read `iio_chan_spec` for `iio_dummy` module. Then came back here.
 
-## The `iio_dummy_read_raw()` Function
+## The `*read_raw` Function
 
-Now it is time to look into some pieces of code. Do you remember the `.type`
-field from the last section? So, here this field will play an important role.
+Now it is time to look for some pieces of code. Do you remember the `.type` field from the last section? So, here this field will play an important role.
 
 ```c
 static int iio_dummy_read_raw(struct iio_dev *indio_dev,
@@ -315,16 +274,8 @@ static int iio_dummy_read_raw(struct iio_dev *indio_dev,
 
 	mutex_lock(&st->lock);
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 12: iio_dummy_read_raw </figcaption>
-</figure>
 
-The `iio_dummy_read_raw` function read data from the `iio_dummy_state` and save
-it on the `*val` and `*val2` parameters. The 'mask' argument, provides the
-required information to support the correct identification of the channel value
-attribute. Finally, look at the `mutex_lock`; all the read operation it is
-under the lock to keep the consistency of the read data.
+The parameters `*val` and `*val2` will be filled in this function in order to return an read value. The `mask` argument, provides the required information for helping to identify the correct way to read the channel value. Finally, look at the `mutex_lock`, all the read operation should happen in a safer way and the lock is reposible to keep the consistence for the read data.  
 
 ```c
 	switch (mask) {
@@ -355,28 +306,13 @@ under the lock to keep the consistency of the read data.
 		}
 		break;
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 13: Find the correct output </figcaption>
-</figure>
 
-Notice that 'mask' refers to the field `.info_mask_separate`, which is used to
-identify the correct channel to read. Second, inside the switch statement, the
-`type` field (from `iio_chan_spec`) is inspected and based on its value an
-action occurs. In this section of the code, the `*val` pointer receives a value
-provided by the `iio_dummy_state` struct that has the sensor state. We will
-stop the explanation of the read function here because the rest of it is
-similar to the above code.
+Notice that `mask` refers to the field `.info_mask_separate`, and now we use it to identify the correct channel to read. Second, we inspect the `type` field and based on it an action are taken. In this section of the code the `*val` pointer receives a value provided by the `st` variable that have the sensor state. We will stop the explanation of the read function here, because the rest of it is similar to the above code.
 
 ## The `*write_raw` Function
 
-The `iio_dummy_write_raw()` function has similar behavior of the
-`iio_dummy_read_raw()`; It has to identify the channel responsible for the
-action and invoke write the information in the `iio_dummy_state`. Different
-from the read function, the write function receives the values in the arguments
-and writes them in the iio_dummy_state. Let's start to look the important
-things about
-`iio_dummy_write_raw()`:
+The `*write_raw()` functions have to identify which channel info, invoke the write operation and then verify the type which is very similar to the `*read_raw()` function. Different from `read_raw` function, that takes values from the state and save in `val` and `val`. Let's start to look the important things about `*write_function`:
+
 
 ```c
 static int iio_dummy_write_raw(struct iio_dev *indio_dev,
@@ -405,35 +341,20 @@ static int iio_dummy_write_raw(struct iio_dev *indio_dev,
 			return -EINVAL;
 		}
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 14: write data </figcaption>
-</figure>
 
-As can be seen in the Code 14, the implementation resembles the read function.
-However, notice that locking is not on the whole `switch`, it is just in a
-small part related to the state since this is the critical section of the code.
+As can be seen in the above snippet of code, it is very similar to `read_raw()`. Notice, that locking is not on the whole `switch` it is just in a small part related to the state since this is the critical section of the code.
 
 ## Putting Things Together with Probe Function
 
-Until now, we just looked at distinct parts of each element of the `iio_dummy`
-module. Now it is time to understand how things connect with each other.
-Typically IIO drivers register itself as an I2C or SPI driver [1], and requires
-two functions: `probe` and `remove`. The former is responsible for allocating
-memory, initialize device fields, and register the device. The latter,
-basically undo what `probe` function did. Let's start to looking at
-`iio_dummy_probe`:
+Until now, we just looked at separated parts of each element of the `iio_dummy` module. Now it is time to understand how things connects with each other. Typically IIO drivers register itself as an I2C or SPI driver [1], and requires two functions: `probe` and `remove`. The former is reponsable for allocate memory, initialize device fields, and register the device. The latter, basically undo what `probe` function did.
+
+Let's start to looking at `iio_dummy_probe`:
 
 ```c
 static struct iio_sw_device *iio_dummy_probe(const char *name)
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 15: Signature </figcaption>
-</figure>
 
-This signature is specifically used for software device, frequently, an
-interface that works with I2C or SPI have a different signature.
+This signature is specifically used for software device, normally, an interface that works with I2C or SPI have a different signature.
 
 ```c
 	int ret;
@@ -460,14 +381,8 @@ interface that works with I2C or SPI have a different signature.
 		goto error_ret;
 	}
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 16: Allocate </figcaption>
-</figure>
 
-The `probe` function has three main tasks. The first task it allocates memory
-for an IIO device, in the Code 16 we can see the allocation space to keep the
-`iio_dummy_state` in memory.
+The `probe` function has three main main tasks. The first task it is allocate memory for an IIO device, in the above code we can seen the allocation space for keep the `iio_dummy_state` in memory.
 
 ```c
 
@@ -513,14 +428,8 @@ for an IIO device, in the Code 16 we can see the allocation space to keep the
 	/* Specify that device provides sysfs type interfaces */
 	indio_dev->modes = INDIO_DIRECT_MODE;
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 17: Data initialization </figcaption>
-</figure>
 
-The second task of `probe` it is data initialization. Take a careful look at
-the Code 17, and you will notice the responsible for the basic handle
-initializations.
+The second task of `probe` it is data initialisation. Take a careful look at the code above, and you will notice the code handle basic initialisations.
 
 ```c
 	ret = iio_simple_dummy_events_register(indio_dev);
@@ -539,11 +448,6 @@ initializations.
 
 	return swd;
 ```
-<figure>
-  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 18: Register </figcaption>
-</figure>
-
 
 The final task of the probe function, it is the device register.
 
