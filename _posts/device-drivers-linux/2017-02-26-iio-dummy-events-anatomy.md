@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "The iio_dummy Events Anatomy"
+title:  "The iio_simple_dummy_event Events Anatomy"
 date:   2017-02-26
 published: true
 categories: linux-kernel
