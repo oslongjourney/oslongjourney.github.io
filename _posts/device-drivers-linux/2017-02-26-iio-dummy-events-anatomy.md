@@ -8,10 +8,10 @@ categories: linux-kernel
 
 Here we continue with our dissection of `iio_dummy` module. In the "[The iio_dummy Anatomy]({{ site.baseurl }}{% post_url 2017-02-26-use-qemu-to-play-with-linux %})", we looked at the `iio_simple_dummy.c` file and with focus on channels configurations and read/write operations. In this post, we going to look at the events used by `iio_dummy`.
 
-Definition: Trigger
-: An IIO device channel is a representation of a data channel; A single IIO
-device may have one or more channels [1].
+First, it is important to know what is an event
 
+Definition: Trigger
+: It is a mechanisms for a driver capture data based on external event (trigger) as opposed to periodically polling for data [1].
 
 ## Event Elements
 
@@ -259,7 +259,7 @@ Code 5 illustrate the processes to write a new configuration to the right channe
 
 The `iio_simple_dummy_read_event_config()` it is very simple, and it just return the value of `st->event_en`. 
 
-## The read/write val
+## The read/write value
 
 The read/write value are two simple funtion responsible for handle the `event_val` field from the struct `iio_dummy_state`.
 
@@ -297,7 +297,9 @@ int iio_simple_dummy_write_event_value(struct iio_dev *indio_dev,
   <figcaption> Code 6: The read/write value </figcaption>
 </figure>
 
-## The event handling function
+## The Event Handling Function
+
+The `iio_simple_dummy_event_handler()` function is responsible for handling the incoming event. For handling the event, the function inspect the value in the `reg_data` (from `iio_dummy_state`) in order to check the option. In the specific case of `iio_dummy`, there is four options (case 0 to 3) in which each option represents one sort of event. Finally, after the target event is identified the `iio_push_event` add the event to the list of userspace reading.
 
 ```c
 static irqreturn_t iio_simple_dummy_event_handler(int irq, void *private)
@@ -315,49 +317,19 @@ static irqreturn_t iio_simple_dummy_event_handler(int irq, void *private)
 					      IIO_EV_TYPE_THRESH, 0, 0, 0),
 			       st->event_timestamp);
 		break;
-	case 1:
-		if (st->activity_running > st->event_val)
-			iio_push_event(indio_dev,
-				       IIO_EVENT_CODE(IIO_ACTIVITY, 0,
-						      IIO_MOD_RUNNING,
-						      IIO_EV_DIR_RISING,
-						      IIO_EV_TYPE_THRESH,
-						      0, 0, 0),
-				       st->event_timestamp);
-		break;
-	case 2:
-		if (st->activity_walking < st->event_val)
-			iio_push_event(indio_dev,
-				       IIO_EVENT_CODE(IIO_ACTIVITY, 0,
-						      IIO_MOD_WALKING,
-						      IIO_EV_DIR_FALLING,
-						      IIO_EV_TYPE_THRESH,
-						      0, 0, 0),
-				       st->event_timestamp);
-		break;
-	case 3:
-		iio_push_event(indio_dev,
-			       IIO_EVENT_CODE(IIO_STEPS, 0, IIO_NO_MOD,
-					      IIO_EV_DIR_NONE,
-					      IIO_EV_TYPE_CHANGE, 0, 0, 0),
-			       st->event_timestamp);
-		break;
-	default:
-		break;
-	}
-
-	return IRQ_HANDLED;
-}
 ```
+<figure>
+  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
+  <figcaption> Code 7: Handler per event </figcaption>
+</figure>
 
-## The `*write_raw` Function
+Code 7 illustrate the processes of get the information from `reg_data`, verify the option, and if it is 0 push the event. Notice the macro `IIO_EVENT_CODE` which is responsible for create an event identifier. Finally, the timestamp related to the event is also stored. The rest of the code, follows a similar patterns just by changing the set of flags.
 
-
-## Putting Things Together with Probe Function
-
+**Attention:**
+If you play with `iio_dummy` events, you will notice that `iio_simple_dummy_event_handler` play an important task in the event handler processes.
+{: .notice_danger}
 
 ## References
 
 1. [IIO Documentation](https://01.org/linuxgraphics/gfx-docs/drm/driver-api/iio/index.html)
 2. [A nice slide about IIO which helped me to understand the subsystem](https://www.slideshare.net/anilchowdary2050/127-iio-anewsubsystem?from_action=save)
-3. [IIO tasks proposed by Daniel Baluta](https://kernelnewbies.org/IIO_tasks)
