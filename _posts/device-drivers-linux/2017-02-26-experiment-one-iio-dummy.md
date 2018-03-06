@@ -6,8 +6,6 @@ published: true
 categories: linux-kernel
 ---
 
-[//]: <> (TODO: Lembrar de adicionar os requisitos das alterações)
-
 In this post, we conduct a series of basic experiment with `iio_dummy`. Here,
 we will do the following tasks:
 
@@ -34,9 +32,8 @@ The picture below shows the steps:
 {% endcapture %}
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption>Steps to activate iio_dummy </figcaption>
+  <figcaption> Figure 1: Steps to activate iio_dummy </figcaption>
 </figure>
-(As imagens no meu navegador (Mozilla Firefox 52.6.0) ficaram muito difíceis de ver, isso vale para todas as imagens)
 
 After enabling the module, you can verify if the options are correctly
 enabled by inspecting the `.config` file. You should see something similar to
@@ -368,8 +365,10 @@ the same approach for all the others channels. Note that `.scan_index` gets
 configures the buffer type as unsigned and with 16 bits for resolution and
 storage.
 
-The channels for the axis Y and Z are similar, they differ by the field `.channel2` and `.scan_index`. Do you remember from the last section that
-I told to remember of `DUMMY_INDEX_SOFT_TIMESTAMP`? So, go to iio_chan_spec again and find for:
+The channels for the axis Y and Z are similar, they differ by the field
+`.channel2` and `.scan_index`. Do you remember from the last section that I
+told to remember of `DUMMY_INDEX_SOFT_TIMESTAMP`? So, go to iio_chan_spec again
+and find for:
 
  The channels for the axis Y and Z are similar; they differ by the field
 `.channel2` and `.scan_index`. Do you remember from the last section that I
@@ -397,8 +396,8 @@ by `DUMMY_INDEX_SOFT_TIMESTAMP`.
 
 ### Initialize values
 
-In the last section we added new channels; we have to initialize them. We do it in
-the `iio_dummy_init_device` function, as described below:
+In the last section we added new channels; we have to initialize them. We do it
+in the `iio_dummy_init_device` function, as described below:
 
 ```c
 static int iio_dummy_init_device(struct iio_dev *indio_dev)

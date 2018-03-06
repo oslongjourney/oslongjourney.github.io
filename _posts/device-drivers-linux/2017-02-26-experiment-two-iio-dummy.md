@@ -77,8 +77,7 @@ $ sudo ./tools/iio/iio_event_monitor my_glorious_dummy_device
 Found IIO device with name my_glorious_dummy_device with device number 0
 ```
 
-You will notice that the program start, but anything unusual occurs (Melhor
-nothing happens ?). Do not
+You will notice that the program start, but nothing happens. Do not
 cancel the execution, just go to the next section.
 
 ## Generating a series of events
@@ -91,6 +90,11 @@ Now that you have `iio_event_monitor` running, open another terminal and type:
  echo 2 > /sys/bus/iio/devices/iio_evgen poke_ev0
  echo 3 > /sys/bus/iio/devices/iio_evgen poke_ev0
 ```
+<figure>
+  {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
+  <figcaption> Code 1: Set of commands to activate event </figcaption>
+</figure>
+
 
 Going back to the terminal with the `iio_event_monitor` running, you should see
 an output similar to:
@@ -104,7 +108,7 @@ Event: time: 1520102778636096750, type: activity(walking), channel: 0, evtype: t
 Event: time: 1520102781584365213, type: steps, channel: 0, evtype: change
 ```
 
-Try the `echo` command from Code 5 (Code 5 não aparece no texto) with different values; you will notice that
+Try the `echo` command from Code 5 with different values; you will notice that
 nothing happens. The question is: why? If you read the
 "[The iio_simple_dummy_event Events Anatomy]({{ site.baseurl }}{% post_url 2017-02-26-iio-dummy-events-anatomy %})"
 you should remember the handling function explanation. There, we saw a switch

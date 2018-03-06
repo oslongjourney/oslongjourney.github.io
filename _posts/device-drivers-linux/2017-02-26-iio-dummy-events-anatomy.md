@@ -14,8 +14,7 @@ used by `iio_dummy`.
 
 First, it is important to know what is an event
 
-(Aqui não deveria ser Definition: Event ?)
-Definition: Trigger
+Definition: Event (Trigger)
 : It is a mechanism for a driver to capture data based on an external event
 (trigger) as opposed to periodically polling for data [1].
 
@@ -48,12 +47,11 @@ struct iio_dummy_state {
 For simplicity sake, we omit some elements from the original struct because it
 is unnecessary for the event part comprehension. Notice that all attributes
 related to events are between the conditional directive `ifdef` based on the
-condition of `CONFIG_IIO_SIM      PLE_DUMMY_EVENTS`. First, an IRQ (Seria bom
-linkar para alguma coisa explicando a definição disso ai) number will
-be required for `iio_dummy`, and the field `event_irq` keeps this value.
-Second, the element `event_val` is responsible for storing any event value.
-Third, it is the `event_en`, which is used to check if the event is enabled or
-not. Finally, the `event_timestamp` register the event's timestamp.
+condition of `CONFIG_IIO_SIMPLE_DUMMY_EVENTS`. First, an IRQ number will be
+required for `iio_dummy`, and the field `event_irq` keeps this value.  Second,
+the element `event_val` is responsible for storing any event value.  Third, it
+is the `event_en`, which is used to check if the event is enabled or not.
+Finally, the `event_timestamp` register the event's timestamp.
 
 ```c
 #ifdef CONFIG_IIO_SIMPLE_DUMMY_EVENTS
@@ -162,8 +160,17 @@ static const struct iio_event_spec iio_walking_event = {
   <figcaption> Code 3: Event channel specification </figcaption>
 </figure>
 
-Code 3 illustrates all the events defined for `iio_dummy`, notice that each one is a struct of `iio_event_spec` which is very similar to `iio_chan_spec`. The `.type` field specifies the event type, which can be: `IIO_EV_TYPE_THRESH`, `IIO_EV_TYPE_MAG`, `IIO_EV_TYPE_ROC`, `IIO_EV_TYPE_THRESH_ADAPTIVE`, `IIO_EV_TYPE_MAG_ADAPTIVE` or `IIO_EV_TYPE_CHANGE`. The `.dir` field describes the direction, there is four possible value for it: `IIO_EV_DIR_EITHER`, `IIO_EV_DIR_RISING`, `IIO_EV_DIR_FALLING`, and `IIO_EV_DIR_NONE`. Finally, the `.mask_separate` configures the mask set to the channel which can be: `IIO_EV_INFO_ENABLE`, `IIO_EV_INFO_VALUE`, `IIO_EV_INFO_HYSTERESIS`, `IIO_EV_INFO_PERIOD`, `IIO_EV_INFO_HIGH_PASS_FILTER_3DB`, and `IIO_EV_INFO_LOW_PASS_FILTER_3DB`.
-
+Code 3 illustrates all the events defined for `iio_dummy`, notice that each one
+is a struct of `iio_event_spec` which is very similar to `iio_chan_spec`. The
+`.type` field specifies the event type, which can be: `IIO_EV_TYPE_THRESH`,
+`IIO_EV_TYPE_MAG`, `IIO_EV_TYPE_ROC`, `IIO_EV_TYPE_THRESH_ADAPTIVE`,
+`IIO_EV_TYPE_MAG_ADAPTIVE` or `IIO_EV_TYPE_CHANGE`. The `.dir` field describes
+the direction, there is four possible value for it: `IIO_EV_DIR_EITHER`,
+`IIO_EV_DIR_RISING`, `IIO_EV_DIR_FALLING`, and `IIO_EV_DIR_NONE`. Finally, the
+`.mask_separate` configures the mask set to the channel which can be:
+`IIO_EV_INFO_ENABLE`, `IIO_EV_INFO_VALUE`, `IIO_EV_INFO_HYSTERESIS`,
+`IIO_EV_INFO_PERIOD`, `IIO_EV_INFO_HIGH_PASS_FILTER_3DB`, and
+`IIO_EV_INFO_LOW_PASS_FILTER_3DB`.
 
 These structs are defined separately, but in some way, they need to be tied to
 the channel. The way to register an event into the channel, is through the
@@ -299,7 +306,7 @@ Code 7 illustrates the processes to write a new configuration to the right
 channel. Remember from the channel configuration in the previous section that
 the first channel was defined as `IIO_VOLTAGE`, and the event associated with
 it has the type `IIO_EV_TYPE_THRESH`. Finally, we are interested only in
-rising(?rasing) event to update the state. The rest of this function follows a similar pattern.
+rising event to update the state. The rest of this function follows a similar pattern.
 
 The `iio_simple_dummy_read_event_config()` is very simple, and just
 returns the value of `st->event_en`. 

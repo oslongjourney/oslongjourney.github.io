@@ -8,28 +8,27 @@ categories: linux-kernel
 
 For several days I dove into the Industrial I/O (IIO) subsystem as an attempt
 to finish the set of tasks proposed by Daniel Baluta [3]. I decided to put a
-lot of effort in Daniel's assignments, due to my plans to write device
-drivers for the IIO subsystem in the near future (I hope). As a result, I decided to
+lot of effort in Daniel's assignments, due to my plans to write device drivers
+for the IIO subsystem in the near future (I hope). As a result, I decided to
 share/register all the knowledge acquired after long hours studying the
-`iio_dummy` module (I believe this will help newcomers like me). This "anatomy study"
-is a part of a set of posts based on the IIO tasks (Acho essa frase
-desnecessária). Finally, you will find general information about the
-IIO system and details about the `iio_dummy` module internals.
+`iio_dummy` module (I believe this will help newcomers like me). Finally, you
+will find here some general information about the IIO system and details about
+the `iio_dummy` module internals.
 
 ## Introduction
 
 Usually, I approach a new Device Driver (DD) that I want to learn
 systematically. First, I try to identify the initialization function. Second, I
-concentrate efforts on discovering the essential elements of the subsystem. Third,
-I seek the read/write functions and dissect them to comprehend their overall
-behavior. Finally, I manage to put all the concepts together. I do not
+concentrate efforts on discovering the essential elements of the subsystem.
+Third, I seek the read/write functions and dissect them to comprehend their
+overall behavior. Finally, I manage to put all the concepts together. I do not
 know if it is a great approach, but I use it in this post.
 
-The best place to begin with IIO subsystem, is the `iio_dummy` module, which
-is a toy application. This module has thousands of valuable comments that help
-to understand the IIO internal. We look at the `iio_dummy`, starting on
-`iio_simple_dummy`; then we go through `iio_simple_dummy_event`,
-`iio_dummy_evgen`, and `iio_simple_dummy_buffer` in another posts.
+The best place to begin with IIO subsystem, is the `iio_dummy` module, which is
+a toy application. This module has thousands of valuable comments that helps to
+understand the IIO internal. We look at the `iio_dummy`, starting on
+`iio_simple_dummy`; then we go through `iio_simple_dummy_event`, and
+`iio_simple_dummy_buffer` in another posts.
 
 ## The IIO Dummy Channels Setup
 
@@ -141,10 +140,9 @@ section. They play a very important role in the device.
   <figcaption> Code 3: .info_mask_shared_by_dir field </figcaption>
 </figure>
 
-The field `info_mask_shared_by_dir` is the information mask shared by
-direction; which means that the channel information is shared with other
-channels that have the same direction.
-(Na real que não entendi aqui o que você quer dizer com direction...)
+The field `info_mask_shared_by_dir` is the information mask shared by direction
+(e.g., in or out); which means that the channel information is shared with
+other channels that have the same direction.
 
 ```c
     /* The ordering of elements in the buffer via an enum */
@@ -189,8 +187,8 @@ There are two final configurations at the end of the first channel, both related
 to events. Notice that events became available only if
 `CONFIG_IIO_SIMPLE_DUMMY_EVENTS` is enabled in the `.config` file.
 In a few words, the `.event_spec` field register an array of events, and the
-`.num_event_specs` is the size of the array. We discuss events in the "X" (Faltou atualizar esse X). 
-"[The iio_dummy Events Anatomy]({{ site.baseurl }}{% post_url 2017-02-26-iio-dummy-events-anatomy %})"
+`.num_event_specs` is the size of the array. We discuss events in the 
+"[The iio_dummy Events Anatomy]({{ site.baseurl }}{% post_url 2017-02-26-iio-dummy-events-anatomy %})".
 
 Now we keep looking the other channels; however, we do not repeat ourselves and
 just explain new things. See:
@@ -376,7 +374,7 @@ The `iio_dummy_write_raw()` function behaves similarly to
 `iio_dummy_read_raw()`; It has to identify the channel responsible for the
 action and write the information in the `iio_dummy_state`. Different
 from the read function, the write function receives the values in the arguments
-and writes them in the iio_dummy_state. Let's start lolooking at the important
+and writes them in the iio_dummy_state. Let's start looking at the important
 things about
 `iio_dummy_write_raw()`:
 
@@ -547,7 +545,6 @@ Code 17, and you will notice how it handles basic initializations.
 
 
 The final task of the probe function, is the device register.
-(Acho que podia ter um encerramento melhor de parágrafo)
 
 ## References
 
