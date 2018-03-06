@@ -14,8 +14,9 @@ used by `iio_dummy`.
 
 First, it is important to know what is an event
 
+(Aqui não deveria ser Definition: Event ?)
 Definition: Trigger
-: It is a mechanism for a driver capture data based on an external event
+: It is a mechanism for a driver to capture data based on an external event
 (trigger) as opposed to periodically polling for data [1].
 
 ## Event Elements
@@ -47,11 +48,12 @@ struct iio_dummy_state {
 For simplicity sake, we omit some elements from the original struct because it
 is unnecessary for the event part comprehension. Notice that all attributes
 related to events are between the conditional directive `ifdef` based on the
-condition of `CONFIG_IIO_SIM      PLE_DUMMY_EVENTS`. First, an IRQ number will
+condition of `CONFIG_IIO_SIM      PLE_DUMMY_EVENTS`. First, an IRQ (Seria bom
+linkar para alguma coisa explicando a definição disso ai) number will
 be required for `iio_dummy`, and the field `event_irq` keeps this value.
-Second, the element `event_val` is responsible for store any event value.
-Third, it is the `event_en` which is used to check if the event is enabled or
-not. Finally, the `event_timestamp` register the timestamp of the event.
+Second, the element `event_val` is responsible for storing any event value.
+Third, it is the `event_en`, which is used to check if the event is enabled or
+not. Finally, the `event_timestamp` register the event's timestamp.
 
 ```c
 #ifdef CONFIG_IIO_SIMPLE_DUMMY_EVENTS
@@ -95,13 +97,13 @@ void iio_simple_dummy_events_unregister(struct iio_dev *indio_dev);
 </figure>
 
 
-The Code 2 illustrates the methods used by the event operations. Functions
+Code 2 illustrates the methods used by the event operations. Functions
 `iio_simple_dummy_read_event_config` and `iio_simple_dummy_write_event_config`
-are dedicated to read and write configuration data. The configuration steps it
-is flexible to allow users to configure it or get information. For read and
-write information from event, there is function
+are dedicated to read and write configuration data. The configuration steps
+is flexible to allow users to configure it or get information from it.
+To access read and write information from event, there are the functions
 `iio_simple_dummy_read_event_value` and `iio_simple_dummy_write_event_value`.
-Finally, there is a signature for register and unregister events. The
+Finally, there is a signature to register and unregister events. The
 implementation of these functions signatures can be found in the
 `iio_simple_dummy_events.c` file, before we dig in these files, we are going to
 look at `iio_simple_dummy.c`.
@@ -157,15 +159,15 @@ static const struct iio_event_spec iio_walking_event = {
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 2: Event channel specification </figcaption>
+  <figcaption> Code 3: Event channel specification </figcaption>
 </figure>
 
-Code 2 illustrates all the events defined for `iio_dummy`, notice that each one is a struct of `iio_event_spec` which is very similar to `iio_chan_spec`. The `.type` field specifies the type of the event, which can be: `IIO_EV_TYPE_THRESH`, `IIO_EV_TYPE_MAG`, `IIO_EV_TYPE_ROC`, `IIO_EV_TYPE_THRESH_ADAPTIVE`, `IIO_EV_TYPE_MAG_ADAPTIVE` or `IIO_EV_TYPE_CHANGE`. The `.dir` field describes the direction, there is four possible value for it: `IIO_EV_DIR_EITHER`, `IIO_EV_DIR_RISING`, `IIO_EV_DIR_FALLING`, and `IIO_EV_DIR_NONE`. Finally, the `.mask_separate` configures the mask set to the channel which can be: `IIO_EV_INFO_ENABLE`, `IIO_EV_INFO_VALUE`, `IIO_EV_INFO_HYSTERESIS`, `IIO_EV_INFO_PERIOD`, `IIO_EV_INFO_HIGH_PASS_FILTER_3DB`, and `IIO_EV_INFO_LOW_PASS_FILTER_3DB`.
+Code 3 illustrates all the events defined for `iio_dummy`, notice that each one is a struct of `iio_event_spec` which is very similar to `iio_chan_spec`. The `.type` field specifies the event type, which can be: `IIO_EV_TYPE_THRESH`, `IIO_EV_TYPE_MAG`, `IIO_EV_TYPE_ROC`, `IIO_EV_TYPE_THRESH_ADAPTIVE`, `IIO_EV_TYPE_MAG_ADAPTIVE` or `IIO_EV_TYPE_CHANGE`. The `.dir` field describes the direction, there is four possible value for it: `IIO_EV_DIR_EITHER`, `IIO_EV_DIR_RISING`, `IIO_EV_DIR_FALLING`, and `IIO_EV_DIR_NONE`. Finally, the `.mask_separate` configures the mask set to the channel which can be: `IIO_EV_INFO_ENABLE`, `IIO_EV_INFO_VALUE`, `IIO_EV_INFO_HYSTERESIS`, `IIO_EV_INFO_PERIOD`, `IIO_EV_INFO_HIGH_PASS_FILTER_3DB`, and `IIO_EV_INFO_LOW_PASS_FILTER_3DB`.
 
 
-These structs are defined separately, but in some way, it needs to be tied to
-the channel. The way to register an event into the channel, it is the field
-`event_spec` from `iio_chan_spec`. See the code:
+These structs are defined separately, but in some way, they need to be tied to
+the channel. The way to register an event into the channel, is through the
+`event_spec` field, from `iio_chan_spec`. See the code:
 
 ```c
 static const struct iio_chan_spec iio_dummy_channels[] = {
@@ -210,10 +212,10 @@ static const struct iio_chan_spec iio_dummy_channels[] = {
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 3: Event inside iio_chan_spec </figcaption>
+  <figcaption> Code 4: Event inside iio_chan_spec </figcaption>
 </figure>
 
-Notice from Code 3 that each `iio_event_spec` was assigned to the `.event_spec`
+Notice from Code 4 that each `iio_event_spec` was assigned to the `.event_spec`
 field.
 
 Finally, it is necessary to fill out the `iio_info` struct as the code below
@@ -236,16 +238,16 @@ static const struct iio_info iio_dummy_info = {
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 4: The iio_info </figcaption>
+  <figcaption> Code 5: The iio_info </figcaption>
 </figure>
 
-Code 4, finishes our hunting for event elements inside `iio_simple_dummy.c`.
+Code 5, finishes our hunting for event elements inside `iio_simple_dummy.c`.
 
 ## The read/write config
 
-Now, we start to look at the core of the `iio_simple_dummy_events.c`; this file
+Now, we start looking at the core of the `iio_simple_dummy_events.c`; this file
 has the implementation of the function's signature from Code 2. All the
-read/write operation related to the event, directly work with the struct
+read/write operations related to the event, directly work with the struct
 `iio_dummy_state` and the fields presented in Code 1. Let's start looking at
 the `iio_simple_dummy_write_event_config`:
 
@@ -266,11 +268,11 @@ int iio_simple_dummy_write_event_config(struct iio_dev *indio_dev,
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 4: The iio_info </figcaption>
+  <figcaption> Code 6: The iio_info </figcaption>
 </figure>
 
 The `iio_simple_dummy_write_event_config` receives many parameters that help to
-identify the correct channel. The `iio_dummy_state` it is retrieved at the
+identify the correct channel. The `iio_dummy_state` is retrieved at the
 beginning of the read function, and it is going to be used in many places.
 Lastly, the `chan` parameter provides a way to identify the type correctly.
 
@@ -290,22 +292,22 @@ Lastly, the `chan` parameter provides a way to identify the type correctly.
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 5: The event type verification </figcaption>
+  <figcaption> Code 7: The event type verification </figcaption>
 </figure>
 
-Code 5 illustrates the processes to write a new configuration to the right
+Code 7 illustrates the processes to write a new configuration to the right
 channel. Remember from the channel configuration in the previous section that
 the first channel was defined as `IIO_VOLTAGE`, and the event associated with
-it has the type `IIO_EV_TYPE_THRESH`. Finally, we are interested only in rising
-event to update the state. The rest of this function follows a similar pattern.
+it has the type `IIO_EV_TYPE_THRESH`. Finally, we are interested only in
+rising(?rasing) event to update the state. The rest of this function follows a similar pattern.
 
-The `iio_simple_dummy_read_event_config()` it is very simple, and just
+The `iio_simple_dummy_read_event_config()` is very simple, and just
 returns the value of `st->event_en`. 
 
 ## The read/write value
 
 There are two functions for reading and writing values. These functions are
-responsible for handle the `event_val` field from the struct `iio_dummy_state`
+responsible for handling the `event_val` field from the struct `iio_dummy_state`
 as the code below show:
 
 ```c
@@ -339,7 +341,7 @@ int iio_simple_dummy_write_event_value(struct iio_dev *indio_dev,
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 6: The read/write value </figcaption>
+  <figcaption> Code 8: The read/write value </figcaption>
 </figure>
 
 ## The Event Handling Function
@@ -370,11 +372,11 @@ static irqreturn_t iio_simple_dummy_event_handler(int irq, void *private)
 ```
 <figure>
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
-  <figcaption> Code 7: Handler per event </figcaption>
+  <figcaption> Code 9: Handler per event </figcaption>
 </figure>
 
-Code 7 illustrate the processes of getting the information from `reg_data`,
-verify the option, and if it is 0 push the event. Notice the macro
+Code 9 illustrate the processes of getting the information from `reg_data`,
+verifying the option, and if it is 0 push the event. Notice the macro
 `IIO_EVENT_CODE` which is responsible for creating an event identifier.
 Finally, the timestamp related to the event is also stored. The rest of the
 code follows a similar pattern just by changing the set of flags.
