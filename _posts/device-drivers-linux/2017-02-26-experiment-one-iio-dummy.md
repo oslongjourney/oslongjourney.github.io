@@ -11,7 +11,7 @@ categories: linux-kernel
 In this post, we conduct a series of basic experiment with `iio_dummy`. Here,
 we will do the following tasks:
 
-1. Enabled IIO dummy via `nconfig`;
+1. Enable IIO dummy via `nconfig`;
 2. Compile IIO dummy module;
 3. Load and unload `iio_dummy` module;
 4. Look at `/sys/bus/iio/*`;
@@ -36,8 +36,9 @@ The picture below shows the steps:
   {{ fig_img | markdownify | remove: "<p>" | remove: "</p>" }}
   <figcaption>Steps to activate iio_dummy </figcaption>
 </figure>
+(As imagens no meu navegador (Mozilla Firefox 52.6.0) ficaram muito difíceis de ver, isso vale para todas as imagens)
 
-After you enabled the module, you can verify if the options are correctly
+After enabling the module, you can verify if the options are correctly
 enabled by inspecting the `.config` file. You should see something similar to
 this:
 
@@ -80,7 +81,7 @@ name:           iio_dummy
 vermagic:       4.16.0-rc3-TORVALDS+ SMP preempt mod_unload modversions
 ```
 
-Next, for checking if the module is correct loaded you can use the `lsmod` and
+Next, for checking if the module is correctly loaded you can use `lsmod` and
 `grep` together. After you execute the command, you should see an output
 similar to:
 
@@ -129,7 +130,7 @@ $ sudo modprobe -r iio_dummy
 
 ### The `configfs`
 
-The last step to create your dummy device, it is mounting a `configfs`
+The last step to create your dummy device, is by mounting a `configfs`
 filesystem in whatever place you want. I prefer to do it in the `/mnt`
 directory, as you can see in the commands below:
 
@@ -149,7 +150,7 @@ $ ls /mnt/iio_experiments/iio/devices/
 dummy
 ```
 
-How about creating a new device? Simple, just create a new directory inside
+How about creating a new device? Simple, just create a new directory inside the
 `dummy` directory:
 
 ```bash
@@ -161,7 +162,7 @@ my_glorious_dummy_device
 
 ### Inspecting the `/sys/bus/iio/devices` (again)
 
-How about look again the `/sys/bus/iio/devices/`?
+How about looking again at the `/sys/bus/iio/devices/`?
 
 ```bash
 $ ls -l /sys/bus/iio/devices/
@@ -170,7 +171,7 @@ lrwxrwxrwx 1 root root 0 Mar  2 16:07 iio:device0 -> ../../../devices/iio:device
 lrwxrwxrwx 1 root root 0 Mar  2 15:55 iio_evgen -> ../../../devices/iio_evgen
 ```
 
-Notice that `iio:device0` now appear in the tree. Let's take a look at it:
+Notice that `iio:device0` now appears in the tree. Let's take a look at it:
 
 ```c
 $ ls -l /sys/bus/iio/devices/iio:device0/ 
@@ -229,9 +230,9 @@ modprobe: FATAL: Module iio_dummy is in use.
 ```
 
 I tried many things to solve the problem. In one of my attempts, I used the
-command `rmmod -r iio_dummy` and realize that I put my kernel in an unstable
+command `rmmod -r iio_dummy` and I realized that I put my kernel in an unstable
 state (I got oops message during the reboot). After some hours trying to figure
-out, I realize the problem is related to the `my_glorious_dummy_device`
+out, I realized the problem is related to the `my_glorious_dummy_device`
 directory previously created. To solve this problem, I just did:
 
 ```bash
@@ -258,7 +259,7 @@ For the new channels, we have the following requirements:
 ### Update simple dummy header
 
 Ok, here we go. We want to add three new channels (one per axes), we start by
-update the file `drivers/iio/dummy/iio_simple_dummy.h`. First of all, define a
+updating the file `drivers/iio/dummy/iio_simple_dummy.h`. First of all, define a
 value for the 3 new channels as follows:
 
 ```c
@@ -367,7 +368,8 @@ the same approach for all the others channels. Note that `.scan_index` gets
 configures the buffer type as unsigned and with 16 bits for resolution and
 storage.
 
-The channels for the axis Y and Z are similar, they differ by the field `.channel2` and `.scan_index`. Do you remember from the last section that I told to rember of `DUMMY_INDEX_SOFT_TIMESTAMP`? So, go to iio_chan_spec again and find for:
+The channels for the axis Y and Z are similar, they differ by the field `.channel2` and `.scan_index`. Do you remember from the last section that
+I told to remember of `DUMMY_INDEX_SOFT_TIMESTAMP`? So, go to iio_chan_spec again and find for:
 
  The channels for the axis Y and Z are similar; they differ by the field
 `.channel2` and `.scan_index`. Do you remember from the last section that I
@@ -386,16 +388,16 @@ again and find for:
   <figcaption>Code 5: IIO_CHAN_SOFT_TIMESTAMP with magic number 4 </figcaption>
 </figure>
 
-The first time that I tried to add a new channel I receive an error indicating
-that the index is already in use. After a long time trying to understand, I
-realize the above line use the scan_index 4, and I was trying to use it. To
+The first time that I tried to add a new channel I received an error indicating
+that the index is already in use. After a long time trying to understand why, I
+realized the above line uses the scan_index 4, and I was trying to use it. To
 make the code more readable (from my perspective), I decided to add this element
 in the `iio_simple_dummy_scan_elements` and finally replace the magic number 4
 by `DUMMY_INDEX_SOFT_TIMESTAMP`.
 
 ### Initialize values
 
-The last section we added new channels; we have to initialize them. We do it in
+In the last section we added new channels; we have to initialize them. We do it in
 the `iio_dummy_init_device` function, as described below:
 
 ```c
@@ -417,7 +419,7 @@ static int iio_dummy_init_device(struct iio_dev *indio_dev)
 </figure>
 
 
-### Update `*read_raw()` to handling the new channel
+### Update `*read_raw()` for handling the new channel
 
 In order to make the data provided by our new channel accessible in the user
 space, we have to expand the `iio_dummy_read_raw()` function. Look the code
@@ -522,7 +524,7 @@ vermagic:       4.16.0-rc3-TORVALDS+ SMP preempt mod_unload modversions
 
 ### Test the changes
 
-For finish this tutorial, let's look again the
+To finish this tutorial, let's look again at
 `/sys/bus/iio/devices/iio:device0/`.
 
 ```bash
