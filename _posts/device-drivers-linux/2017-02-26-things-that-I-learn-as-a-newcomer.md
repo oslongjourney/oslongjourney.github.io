@@ -299,15 +299,26 @@ If you fixe something, you should add Fixes tag
 
 ### Discussion:
 
-When I was working on John Syne patches, I separate my patches based on his fixes. I send a first patchset to Jonathan (the maintainer of IIO), and one of his feedbacks was:
+When I was working on John Syne patches, I separated my patches based on his
+fixes. I sent the first patchset to Jonathan (the maintainer of IIO), and one
+of his feedbacks was:
 
-> [..] Also for these fixes ideally include a 'fixes' tag to the original commit. It makes life easy for the scripts the stable maintainers use to work out when things should apply.
+> [..] Also for these fixes ideally include a 'fixes' tag to the original
+commit. It makes life easy for the scripts the stable maintainers use to work
+out when things should apply.
 
-Instead of going back to the documentation and carefully read about the Fixes, I went to git log and tried to find examples. However, I made the mistake of not carefully check things. As a result I sent another patcheset with the wrong way to handle Fixes. Than, Jonathan said to me:
+Instead of going back to the documentation and carefully read about the Fixes
+tag, I went to git log and tried to find examples. However, I made the mistake
+of not thoroughly check things. As a result, I sent another patchset with the
+wrong way to handle Fixes. Then, Jonathan said to me:
 
-> Please look at the Submitting patches documentation.  This is not what a fixes tag is about!  I'll fix it up this time but please look at it.
+> Please look at the Submitting patches documentation.  This is not what a
+fixes tag is about!  I'll fix it up this time but please look at it.
 
-So, I made the same mistake twice. I felt really shame, but now I understand what I did wrong. Basically I had to add something like this:
+So, I made the same mistake twice. I felt ashamed because I made the same
+mistakes and also wasted Jonathan's time (I believe we should care about
+maintainers time). Although my silly slips, now I understand what I did wrong;
+basically I had to add something like this:
 
 > Fixes: <hash of previous commit fixes> ("message")
 
@@ -319,21 +330,31 @@ Fixes: 8d97a5877 ("staging: iio: meter: new driver for ADE7754 devices")
 
 ## Always Add a Cover-letter in the Patchset
 
-**Quick Answer:** Add a Cover-letter to all patchset you send
+**Quick Answer:**
+Add a Cover-letter to all patchset you send
 {: .notice_danger}
 
 ### Discussion:
 
-Sometime, I send some very simple patchset with the intention to make some cleanups. That time, I was considering "Do I really need to add a cover letter for this simple patchset?". Before send the patch without the cover-letter, I asked again in the kernelnewbies channel on IRC. The answer was unanimous: sending patch with cover-letter is always a good thing to do.
+Sometimes, I send some very simple patchset with the intention to make some
+cleanups. Because of the simplicity of the patches, I had the following
+question in mind: "Do I really need to add a cover letter for this simple
+patchset?". Before sending the patch without the cover-letter, I asked again in
+the kernelnewbies channel on IRC. The answer was unanimous: sending patchset
+with cover-letter is always a right thing to do.
 
 ## Configure Your Name Correctly in the Git
 
-**Quick Answer:** Before send the patch, check if your name is correct the email
+**Quick Answer:**
+Before sending the patch, check if your name is correct the email
 {: .notice_danger}
 
 ### Discussion:
 
-My first patches to the Kernel, have my name written as "rodrigosiqueira". I did not payed attention on this, maybe because it does not look wrong for me at first glance. Than, Dan Carpenter alert me about it [7]. I fixed it by set my name in my git globals configure.
+My first patches to the Kernel, have my name written as "rodrigosiqueira". I
+did not pay attention to this, maybe because it does not look wrong for me at
+first glance. Then, Dan Carpenter alerts me about it [7]. I fixed it by setting
+my name in my git globals configure.
 
 [//]: <> (TODO: Pensar Sobre adicionar: Checkpatch is not About Make Contribution, It is a about Learn Work Flow)
 
