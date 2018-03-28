@@ -69,10 +69,10 @@ technique is the safer way to conduct experiments with Linux kernel because any
 fatal mistake has a few consequences. For example, if you crash the entire
 system, you can create another virtual machine or take one of your backups
 (yes, make a backup of your running kernel images). Experiment on your computer
-is more fun and risk. Any potential problem could break all your system.
-Finally, for the embedded device, you can make tests in a developing kit. In
-this section, we choose our weapons. We will work first with Qemu, followed by
-the local computer. 
+is more fun, but also more risk. Any potential problem could break all your
+system.  Finally, for the embedded device, you can make tests in a developing
+kit. In this section, we choose our weapons. We will work first with Qemu,
+followed by the local computer. 
 
 If you want to use Qemu for work, I recommend you to read my post about it in "[Use Qemu to play with Linux Kernel]({{ site.baseurl }}{% post_url 2017-02-26-use-qemu-to-play-with-linux %})"
 
@@ -106,19 +106,44 @@ use because it simplifies future works.
 
 [comment]: <> (Revisar daqui para baixo)
 
-The `.config` file keeps all the configurations that will be used during the Kernel compilation. In this file you can find which driver or subsystem will be compiled or not. The `.config` file has three possible anwser per target: (1) m, (2) y, and (3) n. The character 'm' means that the target will be compiled as module; the 'y' and 'n' specifies if the subsystem will be compiled/installed or not.
+The `.config` file keeps all the configurations used during the Kernel
+compilation. In this file, you can find which subsystem and configuration will
+be compiled or not. The `.config` file has three possible answers per target:
+(1) m, (2) y, and (3) n. The "m" character means that the target will be
+compiled as a module; the 'y' and 'n' designates if the target will be compiled
+or not as a part of the Kernel image.
 
-Every Linux Distribution (e.g., Arch, Debian, and Fedora) usually maintain and distribute their own `.config` file. The `.config` file from distributions, normally enables most of the available options (specially the device drivers) because they have to run a large variety of hardware. It means, that you may have various device driver in your computer that you do not really need. However, the important thing here is: the more options you have enabled in the `.config` file, more time consume will be the compilation.
+Every Linux Distribution (e.g., Arch, Debian, and Fedora) usually maintain and
+distribute their own `.config` file. The distributions `.config` file; normally
+enables most of the available options (especially the device drivers) because
+they have to run in a large variety of hardware. It means that you may have
+various device driver on your computer that you do not need. Nonetheless, the
+important thing here is: the more options you have enabled in the `.config`
+file, more time will be taken by the compilation.
 
-If it is your first attempt to use your own compiled kernel version, I strongly recommend you to use the `.config` file provided by your distribution to increase the chances of success. Later, you can expand the modification as we describe in this tutorial.
+If it is your first attempt to use your own compiled kernel version, I strongly
+recommend you to use the `.config` file provided by your distribution to
+increase the chances of success. Later, you can expand the modification as we
+describe in this tutorial.
+
+If it is your first attempt to use your own compiled kernel version, I strongly
+recommend you to use the `.config` file provided by your distribution to
+increase the chances of success. Later, you can customize things as we describe
+in this tutorial.
 
 **Attention:**
-The `.config` file is Super power, invest some time to better understand it. Also, save your working `.config` files, it will save time for you.
+The `.config` file has Superpower, I recommend you to invest some time to
+understand it better. Also, save your working `.config` files, it will save
+time for you.
 {: .notice_danger}
 
 ### Get your `.config` file
 
-Depending on the distribution which you use, there is two options to get `.config` file: from `/proc`, or `/boot`. Both cases produces the same results, but it is not all distribution that enables `/proc` option (e.g., Arch enable it, but Debian not). The command bellow make the copy, notice that we suppose that you are in the clone directory of Kernel.
+Depending on the distribution which you use, there are two options to get
+`.config` file: from `/proc`, or `/boot`. Both cases produce the same results,
+but it is not all distribution that enables `/proc` option (e.g., Arch enable
+it, but Debian not). The command bellow makes the copy, notice that I suppose
+that you are in the Linux Kernel directory (previously cloned).
 
 1. Get `.config` from `/proc`
 
@@ -135,10 +160,12 @@ cp /boot/config-`uname -r` .config
 ### Make your customizations
 
 **Attention:**
-There is a basic rule about `.config` file: NEVER CHANGE IT BY HAND, ALWAYS USE A TOOL
+There is a basic rule about `.config` file: NEVER CHANGE IT BY HAND, ALWAYS USE
+A TOOL
 {: .notice_danger}
 
-There is several option to manually change the `.config` file. I will introduce only two:
+There are several options to change the `.config` manually file. I introduce
+two:
 
 ```bash
 make nconfig
@@ -155,7 +182,7 @@ make nconfig
   <figcaption>nconfig</figcaption>
 </figure>
 
-And finally, we have `menuconfig`:
+Finally, we have `menuconfig`:
 
 ```bash
 make menuconfig
@@ -174,7 +201,14 @@ make menuconfig
 
 ### Final considerations about `.config` and tips
 
-When you use a configuration file provided by a Linux Distribution, hundreds of device drivers are enabled; normally, you just need a few driver. All the enabled drivers will raise the compile time with no need for you, fortunetally, there is an option that automatically change the `.config` file in order to enabled only required drivers. However, before use the command, it is highly recommended to enable all the devices that you use with your computer in order to ensure that `.config` file have all the required driver by your machine enabled. In other words, plug all the devices that you normally use before execute the command:
+When you use a configuration file provided by a Linux Distribution, hundreds of
+device drivers are enabled; typically, you need a few drivers. All the enabled
+drivers will raise the compile time with no need for you; fortunately, there is
+an option that automatically changes the `.config` file to enable only required
+drivers. Nonetheless, before using the command, it is highly recommended to
+enable all the devices that you use with your computer to ensure that `.config`
+file have all the required driver for your machine enabled. In other words,
+plug all the devices that you usually use before executing the command:
 
 ```bash
 make localmodconfig
@@ -211,7 +245,8 @@ make -j [two_times_the_number_of_core]
 [//]: <> (TODO: Seria legal expandir a explicação do dobro dos cores)
 Just replace the `two_times_the_number_of_core` for the number of cores you have by two. For example, if you have 8 cores you should add 16.
 
-If you want to compile your kernel for one specific computer arquitecture, you can use:
+This command uses `lsmod` to check the enables or disables devices drivers in
+the `.config` file.
 
 ```bash
 make ARCH=x86_64 -j [two_times_the_number_of_core]
@@ -229,7 +264,8 @@ make modules_install
 
 ## Install new your custom kernel
 
-It is important to pay attention in the installation order, we install modules following:
+It is important to pay attention in the installation order; we install modules
+as following:
 
 1. Install modules
 2. Install header
@@ -237,7 +273,8 @@ It is important to pay attention in the installation order, we install modules f
 4. Update bootloader (Grub)
 
 **Attention:**
-Double your attention in the install steps. You can crash your system because you have execute all commands as a root user.
+Double your attention in the install steps. You can crash your system because
+you have executed all commands as a root user.
 {: .notice_danger}
 
 ### Install modules and headers
@@ -258,7 +295,8 @@ sudo make headers_install INSTALL_HDR_PATH=/usr
 
 ### Install new image (works on Debian)
 
-Finally, it is time to install your Kernel image. This step does not work on Arch Linux, see next section if you are interested in Arch.
+Finally, it is time to install your Kernel image. This step does not work on
+Arch Linux, see next section if you are interested in Arch.
 
 To install the Kernel module just type:
 
@@ -266,27 +304,30 @@ To install the Kernel module just type:
 sudo make install
 ```
 
-We are, reallyyyyy close to finish the process. We just have to update the bootloader, and here we suppose you are using Grub. Type:
+We are, reallyyyyy close to finishing the process. We have to update the
+bootloader, and here we suppose you are using Grub. Type:
 
 ```bash
 sudo update-grub2
 ```
 
-Notice, that the command below is an wrapper to the following command:
+Notice, that the command below is a wrapper to the following command:
 
 ```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-So, if the first command fails try the last one.
+So... If the first command fails, try the last one.
 
 Now, reboot your system and check if everything is ok.
 
 ### Arch Linux Installation
 
-If you use Arch Linux, we present the basics steps to install your custom image. You can find a detailed explanation of this processes in the Arch Linux [wiki](https://wiki.archlinux.org/index.php/Kernels/Traditional_compilation).
+If you use Arch Linux, we present the basics steps to install your custom
+image. You can find a detailed explanation of this processes in the Arch Linux [wiki](https://wiki.archlinux.org/index.php/Kernels/Traditional_compilation).
 
-First, you have copy your kernel image to the `/boot/` directory with the command:
+First, you have copied your kernel image to the `/boot/` directory with the
+command: 
 
 ```bash
 sudo cp -v arch/x86_64/boot/bzImage /boot/vmlinuz-[name]
@@ -302,13 +343,15 @@ Second, you have to create a new `mkinitcpio`. Follow the steps below:
 sudo cp /etc/mkinitcpio.d/linux.present /etc/mkinitcpio.d/linux-[name].present
 ```
 
-2. Open the copied file, and look it line by line and replaces old kernel name by the name you assigned. See the example:
+2. Open the copied file, and look it line by line and replaces the old kernel
+name by the name you assigned. See the example:
 
 **Attention:**
-Keep in mind, that you have to adapt this file by yourself. There is no blind copy and paste here.
+Keep in mind that you have to adapt this file by yourself. There is no blind
+copy and paste here.
 {: .notice_danger}
 
-3. Generate he initramfs
+3. Generate the initramfs
 
 ```bash
 sudo mkinitcpio -p linux-[name].prensent
@@ -316,7 +359,9 @@ sudo mkinitcpio -p linux-[name].prensent
 
 ## Remove
 
-Finally, you may want to remove an old Kernel version for space or organization reasons. First of all, boot in another version of the Kernel that you want to remove and follow the steps below:
+Finally, you may want to remove an old Kernel version for space or organization
+reasons. First of all, boot in another version of the Kernel and follow the
+steps below:
 
 ```bash
 rm -rf /boot/vmlinuz-[target]
